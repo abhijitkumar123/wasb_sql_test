@@ -47,6 +47,6 @@ SELECT
 FROM
     SUPPLIER S
 INNER JOIN
-    InvoiceStaging I ON S.name = I.CompanyName
+    InvoiceStaging I ON S.name = I.CompanyName;
 
 DROP TABLE InvoiceStaging;
