@@ -31,8 +31,3 @@ Values (8, 'Stefano', 'Camisaca','GM Activation',2);
 Insert into EMPLOYEE
 Values (9, 'Andrea', 'Ghibaudi','MD NAM',2);
 
---Test records inserted by me
-Insert into EMPLOYEE
-Values (10, 'Test1_First', 'Test1_Last','MD1 NAM',11);
-Insert into EMPLOYEE
-Values (11, 'Test2_First', 'Test2_Last','MD2 NAM',10);
