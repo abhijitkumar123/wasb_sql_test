@@ -1,24 +1,32 @@
--- Table Structure: employee_id | first_name | last_name,job_title | manager_id
-
--- Create Our Table, employee_id & manager_id TINYINT, for the others just putting in a varchar assumption 
-CREATE TABLE EMPLOYEE (
-    employee_id TINYINT,
-    first_name VARCHAR(40),
-    last_name VARCHAR(40),
-    job_title VARCHAR(100),
-    manager_id TINYINT,
-)
-
-
--- Bulk insert our data, skipping the column headings row 1. Tablock for  performance, will lock the table during the bulk load op
-BULK INSERT EMPLOYEE
-FROM 'C:\Users\fredd\wasb_sql_test\hr\employee_index.csv'
-WITH
+-- Create 2 CTEs, one to get the names of the resources and manager, and the other to get the summed prices of the total_expenses grouped by id
+WITH all_resources AS (
+SELECT E1.employee_id,
+	CONCAT(E1.first_name, ' ', E1.last_name) AS employee_name,
+	E1.manager_id,
+	CONCAT(E2.first_name, ' ', E2.last_name) AS manager_name
+FROM EMPLOYEE E1
+LEFT JOIN EMPLOYEE E2
+ON E1.manager_id = E2.employee_id
+) 
+, total_expenses AS
 (
-    FIRSTROW = 2, 
-    FIELDTERMINATOR = ',',  
-    ROWTERMINATOR = '\n',   
-    TABLOCK
+SELECT Ex.employee_id,
+
+	SUM(unit_price * quantity) AS total_expensed_amount		
+FROM EXPENSE Ex
+LEFT JOIN Employee Em
+ON Ex.employee_id = Em.employee_id
+GROUP BY Ex.employee_id
 )
 
-SELECT * FROM EMPLOYEE
+-- Join these tables together to get the information by using a "WHERE" clause to seek expenses over £1000
+SELECT T.employee_id, 
+	employee_name, 
+	manager_id, 
+	manager_name,
+	total_expensed_amount
+FROM total_expenses T
+LEFT JOIN all_resources R
+ON T.employee_id = R.employee_id
+WHERE total_expensed_amount > 1000
+
