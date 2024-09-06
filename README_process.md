@@ -26,3 +26,17 @@ The main module can be modularized further. As this was time sensitive I have pu
 Since the functions written are in generic format this can be further split to its own classes and apply unit test logic. 
 
 I have also put a docker-compose file to pull up the trino image. Name for the container is `sexi-silverbullet`. Trino sql shell will be accessible using `docker exec -it sexi-silverbullet trino`
+
+Output of 
+
+1. Find_manager_cycle.sql
+
+![alt text](image.png)
+
+2. calculate largest expensor
+
+![alt text](image-1.png)
+
+3. Generate Supplier Payment Plans
+
+![alt text](image-2.png)

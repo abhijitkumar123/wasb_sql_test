@@ -1,30 +1,38 @@
-
-WITH employee_expenses AS (
+WITH invoice_payments AS (
+    SELECT 
+        i.supplier_id,
+        s.name AS supplier_name,
+        i.invoice_amount AS total_invoice_amount,
+        i.due_date,
+        EXTRACT(YEAR FROM i.due_date) * 12 + EXTRACT(MONTH FROM i.due_date) - EXTRACT(YEAR FROM CURRENT_DATE) * 12 - EXTRACT(MONTH FROM CURRENT_DATE) + 1 AS months_until_due,
+        i.invoice_amount AS balance_outstanding
+    FROM 
+        memory.default.invoices i
+    JOIN 
+        memory.default.suppliers s ON i.supplier_id = s.supplier_id
+),
+monthly_payments AS (
     SELECT
-        e.employee_id,
-        e.first_name AS employee_first_name,
-        e.last_name AS employee_last_name,
-        e.manager_id,
-        e2.first_name AS manager_first_name,
-        e2.last_name AS manager_last_name,
-        SUM(exp.unit_price * exp.quantity) AS total_expensed_amount
-    FROM memory.default.employee e
-    LEFT JOIN memory.default.expenses exp ON e.employee_id = exp.employee_id
-    LEFT JOIN memory.default.employee e2 ON e.manager_id = e2.employee_id
-    GROUP BY
-        e.employee_id,
-        e.first_name,
-        e.last_name,
-        e.manager_id,
-        e2.first_name,
-        e2.last_name
+        supplier_id,
+        supplier_name,
+        total_invoice_amount,
+        balance_outstanding,
+        due_date,
+        ROUND(total_invoice_amount / months_until_due, 2) AS monthly_payment_amount,
+        LAST_DAY(DATE_ADD('month', seq - 1, CURRENT_DATE)) AS payment_date
+    FROM 
+        invoice_payments
+    CROSS JOIN UNNEST(SEQUENCE(1, months_until_due)) AS t(seq)
 )
 SELECT
-    employee_id,
-    CONCAT(employee_first_name, ' ', employee_last_name) AS employee_name,
-    manager_id,
-    CONCAT(manager_first_name, ' ', manager_last_name) AS manager_name,
-    total_expensed_amount
-FROM employee_expenses
-WHERE total_expensed_amount > 1000
-ORDER BY total_expensed_amount DESC;
+    supplier_id,
+    supplier_name,
+    SUM(monthly_payment_amount) AS payment_amount,
+    MAX(balance_outstanding) AS balance_outstanding,
+    payment_date
+FROM
+    monthly_payments
+GROUP BY 
+    supplier_id, supplier_name, payment_date
+ORDER BY 
+    supplier_id, payment_date;
