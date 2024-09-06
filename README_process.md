@@ -31,12 +31,12 @@ Output of
 
 1. Find_manager_cycle.sql
 
-![alt text](image.png)
+![alt text](screenshots/Find_manager_cycle.png)
 
 2. calculate largest expensor
 
-![alt text](image-1.png)
+![alt text](screenshots/calculate_largest_expensor.png)
 
 3. Generate Supplier Payment Plans
 
-![alt text](image-2.png)
+![alt text](screenshots/generate_supplier_payment_plans.png)
