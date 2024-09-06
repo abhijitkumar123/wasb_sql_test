@@ -1,0 +1,7 @@
+version: '3'
+services:
+  trino:
+    image: trinodb/trino:latest
+    container_name: sexi-silverbullet
+    ports:
+      - "8080:8080"
