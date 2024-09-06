@@ -19,7 +19,7 @@ monthly_payments AS (
         balance_outstanding,
         due_date,
         ROUND(total_invoice_amount / months_until_due, 2) AS monthly_payment_amount,
-        LAST_DAY(DATE_ADD('month', seq - 1, CURRENT_DATE)) AS payment_date
+        DATE_ADD('day', -1, DATE_ADD('month', 1, DATE_TRUNC('month', DATE_ADD('month', seq - 1, CURRENT_DATE)))) AS payment_date
     FROM 
         invoice_payments
     CROSS JOIN UNNEST(SEQUENCE(1, months_until_due)) AS t(seq)
@@ -35,4 +35,4 @@ FROM
 GROUP BY 
     supplier_id, supplier_name, payment_date
 ORDER BY 
-    supplier_id, payment_date;
+    supplier_id, payment_date asc;
